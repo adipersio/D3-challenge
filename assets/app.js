@@ -11,15 +11,11 @@ var chartMargin = {
 var chartWidth = svgWidth - chartMargin.left - chartMargin.right;
 var chartHeight = svgHeight - chartMargin.top - chartMargin.bottom;
 
-var svg = d3
-  .select("body")
-  .append("svg")
+var svg = d3.select("scatter")
   .attr("height", svgHeight)
   .attr("width", svgWidth);
-
-
-var chartGroup = svg.append("g")
   .attr("transform", `translate(${chartMargin.left}, ${chartMargin.top})`);
+
 
 d3.csv("data.csv").then(function(censusData) {
   console.log(censusData);
@@ -32,26 +28,32 @@ d3.csv("data.csv").then(function(censusData) {
     console.log(state);
  
 
-//   var barSpacing = 10; // desired space between each bar
-//   var scaleY = 10; // 10x scale on rect height
+  // Add X axis
+  var x = d3.scaleLinear()
+    .domain([0, 4000])
+    .range([ 0, svgWidth]);
+  svg.append("g")
+    .attr("transform", "translate(0," + svgHeight + ")")
+    .call(d3.axisBottom(x));
 
-//   // Create a 'barWidth' variable so that the bar chart spans the entire chartWidth.
-//   var barWidth = (chartWidth - (barSpacing * (tvData.length - 1))) / tvData.length;
+  // Add Y axis
+  var y = d3.scaleLinear()
+    .domain([0, 500000])
+    .range([ svgHeight, 0]);
+  svg.append("g")
+    .call(d3.axisLeft(y));
 
-//   // @TODO
-//   // Create code to build the bar chart using the tvData.
-//   chartGroup.selectAll(".bar")
-//     .data(tvData)
-//     .enter()
-//     .append("rect")
-//     .classed("bar", true)
-//     .attr("width", d => barWidth)
-//     .attr("height", d => d.hours * scaleY)
-//     .attr("x", (d, i) => i * (barWidth + barSpacing))
-//     .attr("y", d => chartHeight - d.hours * scaleY);
-// }).catch(function(error) {
-//   console.log(error);
+  // Add dots
+  svg.append('g')
+    .selectAll("dot")
+    .data(data)
 
+    .enter()
+    .append("circle")
+      .attr("cx", function (d) { return x(d.GrLivArea); } )
+      .attr("cy", function (d) { return y(d.SalePrice); } )
+      .attr("r", 1.5)
+      .style("fill", "#69b3a2")
 
 });
 });
